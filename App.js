@@ -1,10 +1,12 @@
 import React from 'react';
 import {Button, StyleSheet, Text, View} from 'react-native';
 import auth from '@react-native-firebase/auth';
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faHeart, faSquare} from '@fortawesome/free-solid-svg-icons';
-import Header from './components/Header';
+import LandingView from './views/LandingView';
 import LoginView from './views/LoginView';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
+
+const Stack = createStackNavigator();
 
 const App = () => {
   const handlePress = () => {
@@ -15,14 +17,12 @@ const App = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Header />
-      <LoginView />
-
-      {/* <FontAwesomeIcon icon={faSquare} />
-      <Text>Favorite beverage: </Text>
-      <FontAwesomeIcon icon={faHeart} color="red" size={48} /> */}
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Welcome" component={LandingView} />
+        <Stack.Screen name="Login" component={LoginView} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 };
 
@@ -31,6 +31,6 @@ export default App;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#1f6f8b',
   },
 });

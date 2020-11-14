@@ -1,10 +1,11 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {Image, StyleSheet, Text, View} from 'react-native';
+import Logo from './Logo';
 
 const Header = () => {
   return (
     <View style={styles.header}>
-      <Text style={styles.text}>Trainig Tracker</Text>
+      <Logo />
     </View>
   );
 };
@@ -13,16 +14,8 @@ export default Header;
 
 const styles = StyleSheet.create({
   header: {
-    flex: 0.15,
-    backgroundColor: '#1aa6b7',
+    flex: 1,
+    backgroundColor: '#1f6f8b',
     justifyContent: 'center',
-    alignContent: 'center',
-    borderBottomWidth: 4,
-    borderBottomColor: '#ff414d',
-  },
-  text: {
-    fontSize: 30,
-    color: 'white',
-    textAlign: 'center',
   },
 });
