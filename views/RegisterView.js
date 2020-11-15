@@ -1,49 +1,41 @@
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faSignInAlt, faUser} from '@fortawesome/free-solid-svg-icons';
-import React, {useEffect, useState} from 'react';
-import auth from '@react-native-firebase/auth';
-
+import {faUserPlus} from '@fortawesome/free-solid-svg-icons';
+import React, {useState} from 'react';
 import {
+  Alert,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import auth from '@react-native-firebase/auth';
 
-const LoginView = ({navigation}) => {
+const RegisterView = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [canLogin, setCanLogin] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
 
-  useEffect(() => {
+  const handleRegister = () => {
     if (email.length > 0 && password.length > 0) {
-      setCanLogin(true);
+      if (password === confirmPassword) {
+        auth()
+          .createUserWithEmailAndPassword(email.trim(), password)
+          .then(() => console.log('Succesfully created user!'))
+          .catch((err) => Alert.alert(err.message));
+      } else {
+        Alert.alert('Passwords must match!');
+      }
     } else {
-      setCanLogin(false);
+      Alert.alert('Enter email and password');
     }
-  }, [email, password]);
-
-  const handleLogin = () => {
-    setLoading(true);
-    auth()
-      .signInWithEmailAndPassword(email.trim(), password)
-      .then(() => {
-        console.log('Signed In');
-        setLoading(false);
-      })
-      .catch((err) => console.log(err));
-    console.log(email, password);
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>Login</Text>
-        {loading && <Text style={styles.headerText}>Loading...</Text>}
-
-        <FontAwesomeIcon icon={faSignInAlt} size={40} color="white" />
+        <Text style={styles.headerText}>Register</Text>
+        <FontAwesomeIcon icon={faUserPlus} size={40} color="white" />
       </View>
       <View style={styles.footer}>
         <View style={styles.form}>
@@ -66,14 +58,20 @@ const LoginView = ({navigation}) => {
             placeholder="Enter password"
             secureTextEntry={true}
           />
+
+          <Text style={styles.formText}>Confirm password</Text>
+          <TextInput
+            style={styles.formInput}
+            value={confirmPassword}
+            textContentType="password"
+            autoCapitalize="none"
+            onChangeText={(text) => setConfirmPassword(text)}
+            placeholder="Enter password"
+            secureTextEntry={true}
+          />
+
           <TouchableOpacity
-            disabled={canLogin ? false : true}
-            onPress={handleLogin}
-            style={styles.buttonLogin}>
-            <Text style={styles.buttonText}>Login</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('Register')}
+            onPress={handleRegister}
             style={styles.buttonRegister}>
             <Text style={styles.buttonText}>Register</Text>
           </TouchableOpacity>
@@ -82,7 +80,7 @@ const LoginView = ({navigation}) => {
     </View>
   );
 };
-export default LoginView;
+export default RegisterView;
 
 const styles = StyleSheet.create({
   container: {
@@ -122,15 +120,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     padding: 0,
   },
-  buttonLogin: {
-    backgroundColor: '#1f6f8b',
-    height: 40,
-    justifyContent: 'center',
-    borderRadius: 20,
-    marginTop: 20,
-  },
+
   buttonRegister: {
-    backgroundColor: '#99a8b2',
+    backgroundColor: '#1f6f8b',
     height: 40,
     justifyContent: 'center',
     borderRadius: 20,

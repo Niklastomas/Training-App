@@ -1,26 +1,51 @@
-import React from 'react';
-import {Button, StyleSheet, Text, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import 'react-native-gesture-handler';
+import {StyleSheet} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import LandingView from './views/LandingView';
 import LoginView from './views/LoginView';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
+import RegisterView from './views/RegisterView';
+import {useDispatch, useSelector} from 'react-redux';
+
+import {setUser} from './redux/actions/userAction';
+import DashboardView from './views/DashboardView';
 
 const Stack = createStackNavigator();
 
 const App = () => {
-  const handlePress = () => {
-    auth()
-      .createUserWithEmailAndPassword('admin@example.com', 'hejhej321')
-      .then(() => console.log('User created'))
-      .catch((err) => console.log(err));
-  };
+  const dispatch = useDispatch();
+  // const [user, setUser] = useState({});
+  const user = useSelector((state) => state.user);
+
+  useEffect(() => {
+    console.log(user);
+    auth().onAuthStateChanged((authUser) => {
+      if (authUser) {
+        dispatch(setUser(authUser));
+        // setUser(authUser);
+      } else {
+        dispatch(setUser(null));
+        // setUser(null);
+      }
+    });
+  }, []);
 
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="Welcome" component={LandingView} />
-        <Stack.Screen name="Login" component={LoginView} />
+        {user.user == null ? (
+          <>
+            <Stack.Screen name="Welcome" component={LandingView} />
+            <Stack.Screen name="Login" component={LoginView} />
+            <Stack.Screen name="Register" component={RegisterView} />
+          </>
+        ) : (
+          <>
+            <Stack.Screen name="Dashboard" component={DashboardView} />
+          </>
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
