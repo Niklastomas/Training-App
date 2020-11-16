@@ -16,7 +16,7 @@ const Stack = createStackNavigator();
 
 const App = () => {
   const dispatch = useDispatch();
-  // const [user, setUser] = useState({});
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const user = useSelector((state) => state.user);
 
   useEffect(() => {
@@ -24,10 +24,10 @@ const App = () => {
     auth().onAuthStateChanged((authUser) => {
       if (authUser) {
         dispatch(setUser(authUser));
-        // setUser(authUser);
+        setIsLoggedIn(true);
       } else {
         dispatch(setUser(null));
-        // setUser(null);
+        setIsLoggedIn(false);
       }
     });
   }, []);
@@ -35,15 +35,15 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        {user.user == null ? (
+        {isLoggedIn ? (
+          <>
+            <Stack.Screen name="Dashboard" component={DashboardView} />
+          </>
+        ) : (
           <>
             <Stack.Screen name="Welcome" component={LandingView} />
             <Stack.Screen name="Login" component={LoginView} />
             <Stack.Screen name="Register" component={RegisterView} />
-          </>
-        ) : (
-          <>
-            <Stack.Screen name="Dashboard" component={DashboardView} />
           </>
         )}
       </Stack.Navigator>
