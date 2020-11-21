@@ -1,21 +1,50 @@
-import React from 'react';
-import {Alert, FlatList, StyleSheet, Text, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import {useSelector} from 'react-redux';
 import auth from '@react-native-firebase/auth';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faUser} from '@fortawesome/free-solid-svg-icons';
 import {SafeAreaView} from 'react-native-safe-area-context';
-
-import {data} from '../utils/data';
+import firestore from '@react-native-firebase/firestore';
+import {workoutTypes} from '../utils/data';
 import Item from '../components/Item';
+import {Picker} from '@react-native-picker/picker';
 
-const DashboardView = (navigation) => {
+const DashboardView = ({navigation}) => {
   const user = useSelector((state) => state.user);
-  console.log(data);
+  const [workout, setWorkout] = useState('Gym');
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setData([]);
+      const data = await firestore()
+        .collection('Workouts')
+        .where('userId', '==', user.user.uid)
+        .get();
+
+      data.forEach((doc) => {
+        console.log(doc.id);
+        setData((prevData) => [...prevData, {id: doc.id, data: doc._data}]);
+      });
+      setLoading(false);
+    };
+    fetchData();
+  }, []);
 
   return (
     <View style={styles.container}>
+      {/* Top Container */}
       <View style={styles.header}>
         <FontAwesomeIcon icon={faUser} size={30} color="white" />
         <Text style={styles.headerText}>{user?.user?.email}</Text>
@@ -30,20 +59,68 @@ const DashboardView = (navigation) => {
           <Text style={styles.buttonText}>Sign Out</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.middle}></View>
-      <SafeAreaView style={styles.bottom}>
-        <FlatList
-          data={data}
-          renderItem={({item}) => (
-            <Item
-              onPress={() => Alert.alert('Hej')}
-              title={item.title}
-              date={item.date}
-              duration={item.duration}
+
+      {/* Middle Container */}
+      <View style={styles.middle}>
+        <Text style={{color: 'white', fontSize: 20, padding: 25}}>
+          Start a new workout
+        </Text>
+        <Picker
+          style={{height: 50, width: 200, color: 'white'}}
+          selectedValue={workout}
+          onValueChange={(item) => setWorkout(item)}>
+          {workoutTypes.map((workoutType) => (
+            <Picker.Item
+              key={workoutType.id}
+              label={workoutType.title}
+              value={workoutType.title}
             />
-          )}
-          keyExtractor={(item) => item.id}
-        />
+          ))}
+        </Picker>
+        <TouchableOpacity
+          style={styles.startButton}
+          onPress={() =>
+            navigation.navigate('Workout', {
+              workout: workout,
+              userId: user.user.uid,
+            })
+          }>
+          <Text style={{color: 'white'}}>Start</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Bottom Container */}
+      <SafeAreaView
+        style={
+          !loading
+            ? styles.bottom
+            : {
+                ...styles.bottom,
+                justifyContent: 'center',
+                alignContent: 'center',
+              }
+        }>
+        {!loading ? (
+          <FlatList
+            data={data}
+            renderItem={({item}) => (
+              <Item
+                key={item.id}
+                onPress={() => Alert.alert('Hej')}
+                title={item.data.workout}
+                date={item.data.date}
+              />
+            )}
+            extraData={data}
+            keyExtractor={(item) => item.id}
+          />
+        ) : (
+          <ActivityIndicator
+            style={styles.loader}
+            size="large"
+            color="#00ff00"
+          />
+        )}
       </SafeAreaView>
     </View>
   );
@@ -57,19 +134,36 @@ const styles = StyleSheet.create({
     alignContent: 'center',
   },
   header: {
-    flex: 0.2,
+    flex: 0.15,
     backgroundColor: '#1f6f8b',
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
+    borderBottomColor: 'white',
+    borderBottomWidth: 4,
   },
   middle: {
-    flex: 0.3,
+    flex: 0.35,
     backgroundColor: '#99a8b2',
+    // justifyContent: 'center',
+    alignItems: 'center',
+  },
+  startButton: {
+    backgroundColor: '#1c2b2d',
+    height: 50,
+    width: 150,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: 'white',
+    marginTop: 30,
   },
   bottom: {
     flex: 0.5,
-    backgroundColor: '#e6d5b8',
+    backgroundColor: '#1c2b2d',
+    borderTopWidth: 4,
+    borderColor: 'white',
   },
   headerText: {
     fontSize: 14,
@@ -82,6 +176,8 @@ const styles = StyleSheet.create({
     height: 30,
     padding: 10,
     borderRadius: 20,
+    borderWidth: 2,
+    borderColor: 'white',
   },
   buttonText: {
     color: 'black',

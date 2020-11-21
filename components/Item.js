@@ -6,8 +6,7 @@ const Item = ({title, date, duration, onPress}) => {
   return (
     <TouchableOpacity onPress={() => onPress()} style={styles.container}>
       <Text style={styles.text}>{title}</Text>
-      <Text style={styles.text}>{date}</Text>
-      <Text style={styles.text}>{duration} min</Text>
+      <Text style={styles.text}>{date?.toDate().toDateString()}</Text>
     </TouchableOpacity>
   );
 };
@@ -18,7 +17,8 @@ const styles = StyleSheet.create({
   container: {
     height: 50,
     backgroundColor: 'white',
-    margin: 10,
+    marginTop: 10,
+    marginHorizontal: 10,
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'space-around',
