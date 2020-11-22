@@ -25,28 +25,38 @@ const DashboardView = ({navigation}) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // TODO order data by date.
+
     const fetchData = async () => {
-      setLoading(true);
-      setData([]);
-      const data = await firestore()
+      await firestore()
         .collection('Workouts')
         .where('userId', '==', user.user.uid)
-        .get();
-
-      data.forEach((doc) => {
-        console.log(doc.id);
-        setData((prevData) => [...prevData, {id: doc.id, data: doc._data}]);
-      });
-      setLoading(false);
+        .onSnapshot((snapshot) => {
+          setData(
+            snapshot?.docs.map((doc) => ({id: doc.id, data: doc.data()})),
+          );
+        });
     };
+    setLoading(true);
     fetchData();
+    setLoading(false);
   }, []);
 
   return (
     <View style={styles.container}>
       {/* Top Container */}
       <View style={styles.header}>
-        <FontAwesomeIcon icon={faUser} size={30} color="white" />
+        <FontAwesomeIcon
+          icon={faUser}
+          size={30}
+          color="white"
+          onPress={() =>
+            navigation.navigate('Profile', {
+              userId: user.user.uid,
+              email: user.user.email,
+            })
+          }
+        />
         <Text style={styles.headerText}>{user?.user?.email}</Text>
         <TouchableOpacity
           onPress={() => {
@@ -106,7 +116,7 @@ const DashboardView = ({navigation}) => {
             renderItem={({item}) => (
               <Item
                 key={item.id}
-                onPress={() => Alert.alert('Hej')}
+                onPress={() => navigation.navigate('Details', {workout: item})}
                 title={item.data.workout}
                 date={item.data.date}
               />

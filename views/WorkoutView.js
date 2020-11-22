@@ -17,7 +17,6 @@ const WorkoutView = ({navigation, route}) => {
   const userId = route.params.userId;
   const workout = route.params.workout;
   const [timer, setTimer] = useState('');
-  const [resetTimer, setResetTimer] = useState(false);
 
   const stopWorkout = (timer) => {
     setModalVisible(true);
@@ -39,7 +38,7 @@ const WorkoutView = ({navigation, route}) => {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>{workout}</Text>
-      <Timer stopWorkout={stopWorkout} resetTimer={resetTimer} />
+      <Timer stopWorkout={stopWorkout} />
       {modalVisible && (
         <Modal animationType="slide" visible={modalVisible}>
           <View style={styles.centeredView}>
@@ -52,8 +51,7 @@ const WorkoutView = ({navigation, route}) => {
                   style={{...styles.openButton, backgroundColor: '#2196F3'}}
                   onPress={() => {
                     saveWorkout();
-
-                    navigation.push('Dashboard');
+                    navigation.navigate('Dashboard');
                     setModalVisible(false);
                   }}>
                   <Text style={styles.textStyle}>Yes</Text>

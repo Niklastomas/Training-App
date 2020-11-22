@@ -12,6 +12,8 @@ import {useDispatch, useSelector} from 'react-redux';
 import {setUser} from './redux/actions/userAction';
 import DashboardView from './views/DashboardView';
 import WorkoutView from './views/WorkoutView';
+import WorkoutDetailsView from './views/WorkoutDetailsView';
+import UserProfileView from './views/UserProfileView';
 
 const Stack = createStackNavigator();
 
@@ -40,6 +42,8 @@ const App = () => {
           <>
             <Stack.Screen name="Dashboard" component={DashboardView} />
             <Stack.Screen name="Workout" component={WorkoutView} />
+            <Stack.Screen name="Details" component={WorkoutDetailsView} />
+            <Stack.Screen name="Profile" component={UserProfileView} />
           </>
         ) : (
           <>

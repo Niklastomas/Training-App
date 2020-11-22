@@ -51,6 +51,7 @@ const Timer = ({stopWorkout, resetTimer}) => {
       ) : null}
 
       <Button
+        color={isActive && 'red'}
         title={isActive ? 'Pause' : 'Start'}
         onPress={isActive ? handlePause : handleStart}
       />

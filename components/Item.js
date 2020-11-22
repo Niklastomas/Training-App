@@ -2,7 +2,7 @@ import React from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 
-const Item = ({title, date, duration, onPress}) => {
+const Item = ({title, date, onPress}) => {
   return (
     <TouchableOpacity onPress={() => onPress()} style={styles.container}>
       <Text style={styles.text}>{title}</Text>
